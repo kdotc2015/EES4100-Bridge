@@ -95,13 +95,17 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_hello_world_OBJECTS = project.$(OBJEXT)
+am_hello_world_OBJECTS = hello_world-project.$(OBJEXT)
 hello_world_OBJECTS = $(am_hello_world_OBJECTS)
-hello_world_LDADD = $(LDADD)
+am__DEPENDENCIES_1 =
+hello_world_DEPENDENCIES = $(am__DEPENDENCIES_1)
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
 am__v_lt_0 = --silent
 am__v_lt_1 = 
+hello_world_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(hello_world_CFLAGS) \
+	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_$(V))
 am__v_P_ = $(am__v_P_$(AM_DEFAULT_VERBOSITY))
 am__v_P_0 = false
@@ -206,6 +210,8 @@ LT_SYS_LIBRARY_PATH =
 MAKEINFO = ${SHELL} /home/init_user/project/config/missing makeinfo
 MANIFEST_TOOL = :
 MKDIR_P = /bin/mkdir -p
+MODBUS_CFLAGS = -I/usr/include/modbus 
+MODBUS_LIBS = -lmodbus 
 NM = /usr/bin/nm -B
 NMEDIT = 
 OBJDUMP = objdump
@@ -220,6 +226,9 @@ PACKAGE_TARNAME = hello_world
 PACKAGE_URL = 
 PACKAGE_VERSION = 0.1
 PATH_SEPARATOR = :
+PKG_CONFIG = /usr/bin/pkg-config
+PKG_CONFIG_LIBDIR = 
+PKG_CONFIG_PATH = 
 RANLIB = ranlib
 SED = /bin/sed
 SET_MAKE = 
@@ -280,6 +289,8 @@ top_builddir = ..
 top_srcdir = ..
 AM_CFLAGS = -Wall
 hello_world_SOURCES = project.c
+hello_world_CFLAGS = $(MODBUS_CFLAGS)
+hello_world_LDADD = $(MODBUS_LIBS)
 all: all-am
 
 .SUFFIXES:
@@ -367,7 +378,7 @@ clean-binPROGRAMS:
 
 hello_world$(EXEEXT): $(hello_world_OBJECTS) $(hello_world_DEPENDENCIES) $(EXTRA_hello_world_DEPENDENCIES) 
 	@rm -f hello_world$(EXEEXT)
-	$(AM_V_CCLD)$(LINK) $(hello_world_OBJECTS) $(hello_world_LDADD) $(LIBS)
+	$(AM_V_CCLD)$(hello_world_LINK) $(hello_world_OBJECTS) $(hello_world_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -375,7 +386,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-include ./$(DEPDIR)/project.Po
+include ./$(DEPDIR)/hello_world-project.Po
 
 .c.o:
 	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -397,6 +408,20 @@ include ./$(DEPDIR)/project.Po
 #	$(AM_V_CC)source='$<' object='$@' libtool=yes \
 #	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
 #	$(AM_V_CC_no)$(LTCOMPILE) -c -o $@ $<
+
+hello_world-project.o: project.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(hello_world_CFLAGS) $(CFLAGS) -MT hello_world-project.o -MD -MP -MF $(DEPDIR)/hello_world-project.Tpo -c -o hello_world-project.o `test -f 'project.c' || echo '$(srcdir)/'`project.c
+	$(AM_V_at)$(am__mv) $(DEPDIR)/hello_world-project.Tpo $(DEPDIR)/hello_world-project.Po
+#	$(AM_V_CC)source='project.c' object='hello_world-project.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+#	$(AM_V_CC_no)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(hello_world_CFLAGS) $(CFLAGS) -c -o hello_world-project.o `test -f 'project.c' || echo '$(srcdir)/'`project.c
+
+hello_world-project.obj: project.c
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(hello_world_CFLAGS) $(CFLAGS) -MT hello_world-project.obj -MD -MP -MF $(DEPDIR)/hello_world-project.Tpo -c -o hello_world-project.obj `if test -f 'project.c'; then $(CYGPATH_W) 'project.c'; else $(CYGPATH_W) '$(srcdir)/project.c'; fi`
+	$(AM_V_at)$(am__mv) $(DEPDIR)/hello_world-project.Tpo $(DEPDIR)/hello_world-project.Po
+#	$(AM_V_CC)source='project.c' object='hello_world-project.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+#	$(AM_V_CC_no)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(hello_world_CFLAGS) $(CFLAGS) -c -o hello_world-project.obj `if test -f 'project.c'; then $(CYGPATH_W) 'project.c'; else $(CYGPATH_W) '$(srcdir)/project.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

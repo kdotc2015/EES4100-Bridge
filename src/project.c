@@ -2,13 +2,14 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <errno.h>
-//#include <modbus_tcp.h>
+#include <modbus-tcp.h>
 #include <modbus.h>
+#include <netinet/in.h>
 
 #define SERVER "140.159.153.159"
-#define PORT "502"
+#define PORT 502
 
-unint16_t tab_reg[64];
+int16_t tab_reg[64];
 int rc;
 int i;
 
@@ -37,7 +38,7 @@ ctx = modbus_new_tcp(SERVER, PORT);/*set IP address and port of server*/
 		fprintf(stderr,"connection successful!\n");
 	     }
 	//read the registers on the server
-	rc = modbus_read_registers(ctx, 0, 10, tab_reg);
+	rc = modbus_read_registers(ctx, 0, 3, tab_reg);
 		if (rc == -1) {
 		    	fprintf(stderr, "%s\n", modbus_strerror(errno));
 			return -1;
