@@ -6,3 +6,6 @@ hello_world_SOURCES = project.c
 hello_world_CFLAGS = $(MODBUS_CFLAGS)
 hello_world_LDADD = $(MODBUS_LIBS)
 
+hello_world_CFLAGS=$(BACNET_CFLAGS)
+hello_world_LDADD=$(BACNET_LIBS)
+
