@@ -44,10 +44,11 @@ static void add_to_list(char *word) {
 				last_object->next=malloc(sizeof(word_object));
 				
 				last_object=last_object->next;
-																						        }
-																							        last_object ->word=strdup(word);
-																							        last_object ->next=NULL;
-																								}
+																						       
+				}
+				last_object ->word=strdup(word);
+				last_object ->next=NULL;
+				}
 
 
 static int modbusinit(void){
@@ -77,21 +78,23 @@ ctx = modbus_new_tcp(SERVER, PORT);/*set IP address and port of server*/
 		}
 		
 		/*read the registers on the server*/
-																		       rc = modbus_read_registers(ctx, 0, 3, tab_reg);
-																			if (rc == -1) {
+		rc = modbus_read_registers(ctx, 0, 3, tab_reg);
+		if (rc == -1) {
 		fprintf(stderr, "%s\n", modbus_strerror(errno));
 	        return -1;										
 		}
 
 		for (i=0; i < rc; i++)
 		printf("reg[%d]=%d (0x%X)\n", i, tab_reg[i], tab_reg[i]); 
-		}																																			                           
-			
+												
+
+
+
 		modbus_close(ctx);
 		/* Close modbus connection*/
 		modbus_free(ctx);
 		/* free allocated modbus_t structure*/
-
+}
    
 
 
@@ -105,9 +108,12 @@ while(1){
                  rc = modbus_read_registers(ctx, 0, 3, tab_reg);
 		 if (rc == -1) {
 	                 	fprintf(stderr, "%s\n", modbus_strerror(errno));
-				return -1;                                                                                                                               }
+				return -1;
+				}
 				
 
-				   for (i=0; i < rc; i++)                                                                                                                   printf("reg[%d]=%d (0x%X)\n", i, tab_reg[i], tab_reg[i]);
-															              		}
+				   for (i=0; i < rc; i++)
+				   printf("reg[%d]=%d (0x%X)\n", i, tab_reg[i], tab_reg[i]);
+
+	           		}
 }
