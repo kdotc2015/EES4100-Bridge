@@ -97,7 +97,8 @@ am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am_hello_world_OBJECTS = hello_world-project.$(OBJEXT)
 hello_world_OBJECTS = $(am_hello_world_OBJECTS)
-hello_world_DEPENDENCIES =
+am__DEPENDENCIES_1 =
+hello_world_DEPENDENCIES = $(am__DEPENDENCIES_1)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
@@ -288,8 +289,8 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AM_CFLAGS = -Wall
 hello_world_SOURCES = project.c
-hello_world_CFLAGS = $(BACNET_CFLAGS)
-hello_world_LDADD = $(BACNET_LIBS)
+hello_world_CFLAGS = $(MODBUS_CFLAGS)
+hello_world_LDADD = $(MODBUS_LIBS)
 all: all-am
 
 .SUFFIXES:
