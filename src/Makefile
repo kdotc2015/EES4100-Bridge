@@ -98,7 +98,7 @@ PROGRAMS = $(bin_PROGRAMS)
 am_hello_world_OBJECTS = hello_world-project.$(OBJEXT)
 hello_world_OBJECTS = $(am_hello_world_OBJECTS)
 am__DEPENDENCIES_1 =
-hello_world_DEPENDENCIES = $(am__DEPENDENCIES_1)
+hello_world_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
 am__v_lt_0 = --silent
@@ -175,6 +175,8 @@ AUTOCONF = ${SHELL} /home/init_user/project/config/missing autoconf
 AUTOHEADER = ${SHELL} /home/init_user/project/config/missing autoheader
 AUTOMAKE = ${SHELL} /home/init_user/project/config/missing automake-1.14
 AWK = gawk
+BACNET_CFLAGS = -DBACDL_ALL 
+BACNET_LIBS = -L/usr/lib -lbacnet -lm 
 CC = gcc
 CCDEPMODE = depmode=gcc3
 CFLAGS = -g -O2
@@ -201,7 +203,7 @@ INSTALL_STRIP_PROGRAM = $(install_sh) -c -s
 LD = /usr/x86_64-pc-linux-gnu/bin/ld -m elf_x86_64
 LDFLAGS = 
 LIBOBJS = 
-LIBS = 
+LIBS = -lpthread 
 LIBTOOL = $(SHELL) $(top_builddir)/libtool
 LIPO = 
 LN_S = ln -s
@@ -289,8 +291,8 @@ top_builddir = ..
 top_srcdir = ..
 AM_CFLAGS = -Wall
 hello_world_SOURCES = project.c
-hello_world_CFLAGS = $(MODBUS_CFLAGS)
-hello_world_LDADD = $(MODBUS_LIBS)
+hello_world_CFLAGS = $(MODBUS_CFLAGS) $(BACNET_CFLAGS)
+hello_world_LDADD = $(MODBUS_LIBS) $(BACNET_LIBS)
 all: all-am
 
 .SUFFIXES:
