@@ -74,7 +74,7 @@ static int Update_Analog_Input_Read_Property(BACNET_READ_PROPERTY_DATA *
  * * Second argument: data to be sent
  * *
  * * Without reconfiguring libbacnet, a maximum of 4 values may be sent */
-    //bacnet_Analog_Input_Present_Value_Set(0, listhead[0]);
+    bacnet_Analog_Input_Present_Value_Set(0, listhead[0]->number);
   //  bacnet_Analog_Input_Present_Value_Set(1, listhead[1]); 
 //    bacnet_Analog_Input_Present_Value_Set(2, listhead[2]);
     if (index == NUM_TEST_DATA)
