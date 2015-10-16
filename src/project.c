@@ -19,7 +19,7 @@
 #include <libbacnet/ai.h>
 #include "bacnet_namespace.h"
 
-#define BACNET_INSTANCE_NO          12
+#define BACNET_INSTANCE_NO          0
 #define BACNET_PORT                 0xBAC1
 #define BACNET_INTERFACE            "lo"
 #define BACNET_DATALINK_TYPE        "bvlc"
@@ -75,8 +75,7 @@ static int Update_Analog_Input_Read_Property(BACNET_READ_PROPERTY_DATA *
  * *
  * * Without reconfiguring libbacnet, a maximum of 4 values may be sent */
     bacnet_Analog_Input_Present_Value_Set(0, listhead[0]->number);
-  //  bacnet_Analog_Input_Present_Value_Set(1, listhead[1]); 
-//    bacnet_Analog_Input_Present_Value_Set(2, listhead[2]);
+    bacnet_Analog_Input_Present_Value_Set(1, listhead[1]->number); 
     if (index == NUM_TEST_DATA)
 	index = 0;
   not_pv:
@@ -314,7 +313,7 @@ static int modbusrun(void)
     while (1) {
 
 	/*read the registers on the server */
-	rc = modbus_read_registers(ctx, 12, 3, tab_reg);
+	rc = modbus_read_registers(ctx, 60, 1, tab_reg);
 	if (rc == -1) {
 	    fprintf(stderr, "%s\n", modbus_strerror(errno));
 	    return -1;
