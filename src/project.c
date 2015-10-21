@@ -30,7 +30,7 @@
 #if RUN_AS_BBMD_CLIENT
 #define BACNET_BBMD_PORT            0xBAC0
 #define BACNET_BBMD_ADDRESS         "140.159.160.7"
-#define BACNET_BBMD_TTL             60
+#define BACNET_BBMD_TTL             12
 #endif
 
 
@@ -90,16 +90,16 @@ static int Update_Analog_Input_Read_Property(BACNET_READ_PROPERTY_DATA *
 if(listhead[instance_no] !=NULL){
    pthread_mutex_lock(&timer_lock);
    current_object = list_get_first(&listhead[instance_no]);
+	}
 
-
-    //bacnet_Analog_Input_Present_Value_Set(instance_no, listhead[instance_no]);
-    // bacnet_Analog_Input_Present_Value_Set(1, listhead[1]->number);
+//    bacnet_Analog_Input_Present_Value_Set(instance_no, listhead[instance_no]);
+     bacnet_Analog_Input_Present_Value_Set(instance_no, current_object->number);
     if (index == NUM_TEST_DATA)
 	index = 0;
   not_pv:
     return bacnet_Analog_Input_Read_Property(rpdata);
     pthread_mutex_unlock(&timer_lock);
-}
+
 }
 /*setup bacnet device object*/
 static bacnet_object_functions_t server_objects[] = {
@@ -328,9 +328,10 @@ static void *modbusrun(void *arg)
 	    return NULL;
 	}
 
-	for (i = 0; i < rc; i++)
+	for (i = 0; i < rc; i++) {
 	    add_to_list(&listhead[i], tab_reg[i]);
-	printf("reg[%d]=%d (0x%X)\n", i, tab_reg[i], tab_reg[i]);
+	    printf("reg[%d]=%d (0x%X)\n", i, tab_reg[i], tab_reg[i]);
+	}
 	usleep(100000);
 
     }
