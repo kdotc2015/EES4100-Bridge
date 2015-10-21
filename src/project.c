@@ -56,12 +56,23 @@ int i;
 //create a pointer to store current variables memory location
 static cur_val *listhead[4];
 
+static cur_val *list_get_first(cur_val ** list_head)
+{
+    cur_val *first_object;
+
+    first_object = *list_head;
+    *list_head = (*list_head)->next;
+    fprintf(stderr, "get first number");
+    return first_object;
+}
+
 #define NUM_TEST_DATA (sizeof(listhead)/sizeof(listhead[0]))
 static pthread_mutex_t timer_lock = PTHREAD_MUTEX_INITIALIZER;
 static int Update_Analog_Input_Read_Property(BACNET_READ_PROPERTY_DATA *
 					     rpdata)
 {
     static int index;
+    cur_val *current_object;
     int instance_no =
 	bacnet_Analog_Input_Instance_To_Index(rpdata->object_instance);
     if (rpdata->object_property != bacnet_PROP_PRESENT_VALUE)
@@ -76,17 +87,20 @@ static int Update_Analog_Input_Read_Property(BACNET_READ_PROPERTY_DATA *
  * * Second argument: data to be sent
  * *
  * * Without reconfiguring libbacnet, a maximum of 4 values may be sent */
-    current_object = list_get_first(&listhead[instance]);
+if(listhead[instance_no] !=NULL){
+   pthread_mutex_lock(&timer_lock);
+   current_object = list_get_first(&listhead[instance_no]);
 
 
-    bacnet_Analog_Input_Present_Value_Set(instance, listhead[instance]);
+    //bacnet_Analog_Input_Present_Value_Set(instance_no, listhead[instance_no]);
     // bacnet_Analog_Input_Present_Value_Set(1, listhead[1]->number);
     if (index == NUM_TEST_DATA)
 	index = 0;
   not_pv:
     return bacnet_Analog_Input_Read_Property(rpdata);
+    pthread_mutex_unlock(&timer_lock);
 }
-
+}
 /*setup bacnet device object*/
 static bacnet_object_functions_t server_objects[] = {
     {bacnet_OBJECT_DEVICE,
@@ -201,30 +215,23 @@ bacnet_apdu_set_confirmed_handler( \
 SERVICE_CONFIRMED_##service, \
 bacnet_handler_##handler)
 
-/*linked list object */
-typedef struct s_word_object word_object;
-struct s_word_object {
-    char *word;
-    word_object *next;
-};
-
-static word_object *list_heads[NUM_LISTS];
+static cur_val *list_heads[NUM_LISTS];
 static pthread_mutex_t list_lock = PTHREAD_MUTEX_INITIALIZER;
 static pthread_cond_t list_data_ready = PTHREAD_COND_INITIALIZER;
 static pthread_cond_t list_data_flush = PTHREAD_COND_INITIALIZER;
 
 /* add object to list*/
-static void add_to_list(word_object ** list_head, char *word)
+static void add_to_list(cur_val ** list_head, int number)
 {
-    word_object *last_object, *tmp_object;
+    cur_val *last_object, *tmp_object;
     char *tmp_string;
 
     //do all allocation outside of locking
-    tmp_object = malloc(sizeof(word_object));
-    tmp_string = strdup(word);
+    tmp_object = malloc(sizeof(cur_val));
+    //tmp_string = strdup(number);
     fprintf(stderr, "add to list\n");
     //setup tmp_object outside of locking
-    tmp_object->word = tmp_string;
+    tmp_object->number = number;
     tmp_object->next = NULL;
 
     pthread_mutex_lock(&list_lock);
@@ -245,21 +252,11 @@ static void add_to_list(word_object ** list_head, char *word)
     pthread_cond_signal(&list_data_ready);
 }
 
-static word_object *list_get_first(word_object ** list_head)
-{
-    word_object *first_object;
-
-    first_object = *list_head;
-    *list_head = (*list_head)->next;
-    fprintf(stderr, "get first word");
-    return first_object;
-}
-
 static void *print_func(void *arg)
 {
-    word_object **list_head = (word_object **) arg;
+    cur_val **list_head = (cur_val **) arg;
 
-    word_object *current_object;
+    cur_val *current_object;
 
     fprintf(stderr, "Print thread starting\n");
     while (1) {
@@ -271,8 +268,8 @@ static void *print_func(void *arg)
 	pthread_mutex_unlock(&list_lock);
 /* printf() and free() can block, make sure that we've released
  * * list_lock first */
-	printf("Print thread: %s\n", current_object->word);
-	free(current_object->word);
+	printf("Print thread: %i\n", current_object->number);
+	//free(current_object->number);
 	free(current_object);
 /* Let list_flush() know that we've done some work */
 	pthread_cond_signal(&list_data_flush);
@@ -281,7 +278,7 @@ static void *print_func(void *arg)
     return arg;
 }
 
-static void list_flush(word_object * list_head)
+static void list_flush(cur_val * list_head)
 {
     pthread_mutex_lock(&list_lock);
     while (list_head != NULL) {
@@ -294,18 +291,18 @@ static void list_flush(word_object * list_head)
 }
 
 
-static int modbusrun(void)
+static void *modbusrun(void *arg)
 {
 
-  modbus_start:
 /* Initialise Modbus*/
     modbus_t * ctx;
 /* Modbus Client*/
+  modbus_start:
     ctx = modbus_new_tcp(SERVER, PORT);	/*set IP address and port of server */
 
     if (ctx == NULL) {
 	fprintf(stderr, "Unable to allocate libmodbus context\n");
-	return -1;
+	return NULL;
     } else {
 	fprintf(stderr, "Modbus created succesfully\n");
     }
@@ -325,10 +322,10 @@ static int modbusrun(void)
     while (1) {
 
 	/*read the registers on the server */
-	rc = modbus_read_registers(ctx, 60, 1, tab_reg);
+	rc = modbus_read_registers(ctx, 60, 2, tab_reg);
 	if (rc == -1) {
 	    fprintf(stderr, "%s\n", modbus_strerror(errno));
-	    return -1;
+	    return NULL;
 	}
 
 	for (i = 0; i < rc; i++)
@@ -357,7 +354,7 @@ int main(int argv, char **argc)
     BACNET_ADDRESS src;
 
     pthread_t minute_tick_id, second_tick_id;
-    pthread_t modbusrun_id
+    pthread_t modbusrun_id;
 	bacnet_Device_Set_Object_Instance_Number(BACNET_INSTANCE_NO);
 
     bacnet_address_init();
