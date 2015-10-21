@@ -29,7 +29,7 @@
 
 #if RUN_AS_BBMD_CLIENT
 #define BACNET_BBMD_PORT            0xBAC0
-#define BACNET_BBMD_ADDRESS         "140.159.160.7"
+#define BACNET_BBMD_ADDRESS    	"140.159.160.7"
 #define BACNET_BBMD_TTL             60
 #endif
 
@@ -55,7 +55,7 @@ int rc;
 int i;
 //create a pointer to store current variables memory location
 static cur_val *listhead[4];
-
+static pthread_mutex_t listhlock=PTHREAD_MUTEX_INITIALIZER;
 static cur_val *list_get_first(cur_val ** list_head)
 {
     cur_val *first_object;
@@ -87,18 +87,21 @@ static int Update_Analog_Input_Read_Property(BACNET_READ_PROPERTY_DATA *
  * * Second argument: data to be sent
  * *
  * * Without reconfiguring libbacnet, a maximum of 4 values may be sent */
+pthread_mutex_lock(&listhlock);
 if(listhead[instance_no] !=NULL){
-   pthread_mutex_lock(&timer_lock);
+  
    current_object = list_get_first(&listhead[instance_no]);
-	}
+	
 
 //    bacnet_Analog_Input_Present_Value_Set(instance_no, listhead[instance_no]);
      bacnet_Analog_Input_Present_Value_Set(instance_no, current_object->number);
     if (index == NUM_TEST_DATA)
 	index = 0;
+  }
   not_pv:
+   
+   pthread_mutex_unlock(&listhlock);
     return bacnet_Analog_Input_Read_Property(rpdata);
-    pthread_mutex_unlock(&timer_lock);
 
 }
 /*setup bacnet device object*/
@@ -322,7 +325,7 @@ static void *modbusrun(void *arg)
     while (1) {
 
 	/*read the registers on the server */
-	rc = modbus_read_registers(ctx, 60, 2, tab_reg);
+	rc = modbus_read_registers(ctx, 12, 5, tab_reg);
 	if (rc == -1) {
 	    fprintf(stderr, "%s\n", modbus_strerror(errno));
 	    return NULL;
