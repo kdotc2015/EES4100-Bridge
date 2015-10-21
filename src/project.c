@@ -30,7 +30,7 @@
 #if RUN_AS_BBMD_CLIENT
 #define BACNET_BBMD_PORT            0xBAC0
 #define BACNET_BBMD_ADDRESS         "140.159.160.7"
-#define BACNET_BBMD_TTL             12
+#define BACNET_BBMD_TTL             60
 #endif
 
 
