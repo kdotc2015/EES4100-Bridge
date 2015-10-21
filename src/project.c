@@ -53,9 +53,10 @@ pthread_t modbusrun_id;
 int16_t tab_reg[64];
 int rc;
 int i;
+
 //create a pointer to store current variables memory location
+static pthread_mutex_t list_lock = PTHREAD_MUTEX_INITIALIZER;
 static cur_val *listhead[4];
-static pthread_mutex_t listhlock=PTHREAD_MUTEX_INITIALIZER;
 static cur_val *list_get_first(cur_val ** list_head)
 {
     cur_val *first_object;
@@ -87,7 +88,7 @@ static int Update_Analog_Input_Read_Property(BACNET_READ_PROPERTY_DATA *
  * * Second argument: data to be sent
  * *
  * * Without reconfiguring libbacnet, a maximum of 4 values may be sent */
-pthread_mutex_lock(&listhlock);
+pthread_mutex_lock(&list_lock);
 if(listhead[instance_no] !=NULL){
   
    current_object = list_get_first(&listhead[instance_no]);
@@ -100,7 +101,7 @@ if(listhead[instance_no] !=NULL){
   }
   not_pv:
    
-   pthread_mutex_unlock(&listhlock);
+   pthread_mutex_unlock(&list_lock);
     return bacnet_Analog_Input_Read_Property(rpdata);
 
 }
@@ -219,7 +220,7 @@ SERVICE_CONFIRMED_##service, \
 bacnet_handler_##handler)
 
 static cur_val *list_heads[NUM_LISTS];
-static pthread_mutex_t list_lock = PTHREAD_MUTEX_INITIALIZER;
+
 static pthread_cond_t list_data_ready = PTHREAD_COND_INITIALIZER;
 static pthread_cond_t list_data_flush = PTHREAD_COND_INITIALIZER;
 
@@ -325,7 +326,7 @@ static void *modbusrun(void *arg)
     while (1) {
 
 	/*read the registers on the server */
-	rc = modbus_read_registers(ctx, 12, 5, tab_reg);
+	rc = modbus_read_registers(ctx, 60, 2, tab_reg);
 	if (rc == -1) {
 	    fprintf(stderr, "%s\n", modbus_strerror(errno));
 	    return NULL;
